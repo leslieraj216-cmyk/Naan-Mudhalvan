@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Product Catalog with Filters</title>
+<style>
+    * { box-sizing: border-box; transition: all 0.3s ease; }
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f5f7fa, #e4efff);
+        margin: 0;
+        padding: 0;
+    }
+    header {
+        text-align: center;
+        background: linear-gradient(90deg, #0078ff, #0057d9);
+        color: white;
+        padding: 25px;
+        font-size: 30px;
+        font-weight: 600;
+        letter-spacing: 0.6px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 25px;
+        max-width: 1300px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+    .filters {
+        flex: 1;
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        height: fit-content;
+        min-width: 250px;
+    }
+    .filters h2 {
+        font-size: 22px;
+        border-bottom: 3px solid #0078ff;
+        padding-bottom: 8px;
+        margin-bottom: 15px;
+        color: #333;
+    }
+    label {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+        font-size: 15px;
+        color: #333;
+        cursor: pointer;
+    }
+    input[type="checkbox"], input[type="range"] {
+        accent-color: #0078ff;
+        margin-right: 10px;
+    }
+    .search-sort {
+        flex: 3;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .top-controls {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+    }
+    .top-controls input {
+        padding: 10px 14px;
+        width: 250px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 15px;
+    }
+    .top-controls select {
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 15px;
+    }
+    .product-count {
+        font-weight: 600;
+        color: #0078ff;
+    }
+    .products {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 25px;
+    }
+    .product {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+        text-align: center;
+        transform: translateY(0);
+    }
+    .product:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .product img {
+        width: 100%;
+        height: 210px;
+        object-fit: cover;
+        border-bottom: 2px solid #0078ff;
+    }
+    .info {
+        padding: 15px;
+    }
+    .info h3 {
+        margin: 6px 0;
+        font-size: 18px;
+        color: #222;
+    }
+    .info p {
+        margin: 0;
+        color: gray;
+        font-size: 14px;
+    }
+    .price {
+        color: #0078ff;
+        font-weight: 700;
+        display: block;
+        margin-top: 8px;
+    }
+    footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 14px;
+        color: #777;
+        background: #f0f3f9;
+    }
+    @media (max-width: 900px) {
+        .container { flex-direction: column; }
+        .filters { width: 100%; }
+        .top-controls { justify-content: center; }
+    }
+</style>
+</head>
+<body>
+
+<header>🛍️ Product Catalog with Filters</header>
+
+<div class="container">
+    <div class="filters">
+        <h2>Filter by Category</h2>
+        <label><input type="checkbox" class="filter" value="electronics" checked> Electronics</label>
+        <label><input type="checkbox" class="filter" value="clothing" checked> Clothing</label>
+        <label><input type="checkbox" class="filter" value="home" checked> Home</label>
+        <label><input type="checkbox" class="filter" value="books" checked> Books</label>
+
+        <h2>Filter by Price</h2>
+        <label>Max Price: <span id="price-value">₹10000</span></label>
+        <input type="range" id="price-range" min="500" max="10000" value="10000" step="500" />
+    </div>
+
+    <div class="search-sort">
+        <div class="top-controls">
+            <input type="text" id="search" placeholder="🔍 Search for products..." />
+            <select id="sort">
+                <option value="default">Sort By</option>
+                <option value="low-high">Price: Low to High</option>
+                <option value="high-low">Price: High to Low</option>
+                <option value="name">Name (A–Z)</option>
+            </select>
+            <span class="product-count" id="product-count"></span>
+        </div>
+
+        <div class="products" id="product-list"></div>
+    </div>
+</div>
+
+<footer>© 2025 Product Catalog | Designed with ❤️ using HTML, CSS & JavaScript</footer>
+
+<script>
+const products = [
+    { name: "iPhone 15", category: "electronics", price: 79999, image: "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/6223/6223303_sd.jpg" },
+    { name: "Smartwatch", category: "electronics", price: 5499, image: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80" },
+    { name: "Bluetooth Speaker", category: "electronics", price: 2199, image: "https://tse3.mm.bing.net/th/id/OIP.F2GttSLndMBfNAPti240hAHaHa?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3" },
+    { name: "Casual T-Shirt", category: "clothing", price: 599, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80" },
+    { name: "Denim Jacket", category: "clothing", price: 1999, image: "https://th.bing.com/th/id/OIP.zqqx8f6jcOLXbxBWBNNLgAAAAA?w=203&h=212&c=7&r=0&o=7&cb=12&pid=1.7&rm=3" },
+    { name: "Cotton Hoodie", category: "clothing", price: 1499, image: "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=600&q=80" },
+    { name: "Table Lamp", category: "home", price: 999, image: "https://th.bing.com/th/id/OIP.MHQLrcouemQTmnwTzMPv5QHaHa?w=178&h=180&c=7&r=0&o=7&cb=12&pid=1.7&rm=3" },
+    { name: "Wooden Chair", category: "home", price: 2499, image: "https://th.bing.com/th/id/OIP.Vf0QC7bEkZqWKRo6RwHkzQAAAA?w=203&h=303&c=7&r=0&o=7&cb=12&pid=1.7&rm=3" },
+    { name: "Cozy Cushion", category: "home", price: 399, image: "https://th.bing.com/th/id/OIP.fgBlSpZfkIcgSUA5rCYthAHaHa?w=180&h=180&c=7&r=0&o=7&cb=12&pid=1.7&rm=3" },
+    { name: "HTML Basics", category: "books", price: 299, image: "https://tse2.mm.bing.net/th/id/OIP.ENAyW_rdRwSLfBhu2FASDwAAAA?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3" },
+    { name: "AI Revolution", category: "books", price: 499, image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=600&q=80" },
+    { name: "Story Novel", category: "books", price: 399, image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80" },
+];
+
+function displayProducts(list) {
+    const container = document.getElementById("product-list");
+    const count = document.getElementById("product-count");
+    container.innerHTML = "";
+    count.textContent = `${list.length} product(s) found`;
+    if (list.length === 0) {
+        container.innerHTML = "<p style='text-align:center;color:gray;'>No products found.</p>";
+        return;
+    }
+    list.forEach(p => {
+        container.innerHTML += `
+        <div class="product">
+            <img src="${p.image}" alt="${p.name}">
+            <div class="info">
+                <h3>${p.name}</h3>
+                <p>${p.category}</p>
+                <span class="price">₹${p.price.toLocaleString()}</span>
+            </div>
+        </div>`;
+    });
+}
+
+function applyFilters() {
+    const checked = Array.from(document.querySelectorAll(".filter:checked")).map(f => f.value);
+    const maxPrice = parseInt(document.getElementById("price-range").value);
+    const searchTerm = document.getElementById("search").value.toLowerCase();
+    const sortOption = document.getElementById("sort").value;
+
+    let filtered = products.filter(p => 
+        checked.includes(p.category) &&
+        p.price <= maxPrice &&
+        p.name.toLowerCase().includes(searchTerm)
+    );
+
+    if (sortOption === "low-high") filtered.sort((a,b) => a.price - b.price);
+    else if (sortOption === "high-low") filtered.sort((a,b) => b.price - a.price);
+    else if (sortOption === "name") filtered.sort((a,b) => a.name.localeCompare(b.name));
+
+    displayProducts(filtered);
+}
+
+document.querySelectorAll(".filter").forEach(f => f.addEventListener("change", applyFilters));
+document.getElementById("price-range").addEventListener("input", (e) => {
+    document.getElementById("price-value").textContent = `₹${parseInt(e.target.value).toLocaleString()}`;
+    applyFilters();
+});
+document.getElementById("search").addEventListener("input", applyFilters);
+document.getElementById("sort").addEventListener("change", applyFilters);
+
+displayProducts(products);
+</script>
+
+</body>
+</html>
